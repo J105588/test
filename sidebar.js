@@ -1,3 +1,5 @@
+// sidebar.js
+
 import GasAPI from './api.js';
 
 const sidebarHTML = `
@@ -42,12 +44,53 @@ export function loadSidebar() {
   const container = document.getElementById('sidebar-container');
   if (container) {
     container.innerHTML = sidebarHTML;
-    updateModeDisplay(); // モード表示を更新
+    updateModeDisplay(); // 必要な関数を呼び出す
   }
 }
 
 export function showModeChangeModal() {
   document.getElementById("mode-change-modal").style.display = 'block';
+}
+
+export function closeModeModal() {
+  document.getElementById("mode-change-modal").style.display = 'none';
+}
+
+// モード変更を適用する関数
+export async function applyModeChange() {
+  const modeRadios = document.querySelectorAll('input[name="mode"]');
+  const password = document.getElementById("mode-password").value;
+  let selectedMode;
+
+  modeRadios.forEach(radio => {
+    if (radio.checked) {
+      selectedMode = radio.value;
+    }
+  });
+
+  try {
+    const result = await GasAPI.verifyModePassword(selectedMode, password);
+    
+    if (result.success) {
+      localStorage.setItem('currentMode', selectedMode); // 現在のモードを保存
+      updateModeDisplay(); // 表示を更新
+      alert(`${selectedMode} モードに切り替えました`);
+      closeModeModal(); // モーダルを閉じる
+    } else {
+      alert('パスワードが間違っています。');      
+    }
+  } catch (error) {
+    alert(`エラーが発生しました: ${error.message}`);
+  }
+}
+
+// モード表示を更新する関数
+export function updateModeDisplay() {
+  const modeDisplay = document.getElementById("current-mode-display");
+  if (modeDisplay) {
+    const currentMode = localStorage.getItem('currentMode') || '通常モード';
+    modeDisplay.textContent = currentMode;
+  }
 }
 
 export function toggleSidebar() {

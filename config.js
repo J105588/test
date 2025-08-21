@@ -7,7 +7,7 @@
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyeLSEgOFpkKfCsytk1tcCcMCQs02-8dIopFC1b_t2QO7SAZ8rY_n5pFDVqSOztJGU/exec"; // API
 
 // デバッグモード（開発時はtrue、本番はfalse）
-const DEBUG_MODE = true;
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
 
 // ログ出力関数
 function debugLog(message, data = null) {
@@ -19,3 +19,5 @@ function debugLog(message, data = null) {
         }
     }
 }
+
+export { GAS_API_URL, DEBUG_MODE, debugLog };

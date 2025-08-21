@@ -29,13 +29,12 @@ window.onload = async () => {
     document.getElementById('admin-indicator').style.display = 'block';
     document.getElementById('admin-login-btn').style.display = 'none';
     document.getElementById('submit-button').style.display = 'none';
-    //Show check-in selected button
     document.getElementById('check-in-selected-btn').style.display = 'block';
   } else {
     document.getElementById('admin-indicator').style.display = 'none';
     document.getElementById('admin-login-btn').style.display = 'block';
     document.getElementById('submit-button').style.display = 'block';
-     document.getElementById('check-in-selected-btn').style.display = 'none';
+    document.getElementById('check-in-selected-btn').style.display = 'none';
   }
 
   showLoader(true); // ロードインジケーターを表示
@@ -44,7 +43,7 @@ window.onload = async () => {
     const seatData = await GasAPI.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
 
     console.log("Received seatData:", seatData);
-
+    
     if (seatData.success === false) {
       alert('データ読み込み失敗: ' + seatData.error);
       return;
@@ -52,7 +51,7 @@ window.onload = async () => {
 
     drawSeatMap(seatData.seatMap); // 座席マップを描画
     updateLastUpdateTime(); // 最終更新時間を更新
-    startAutoRefresh(); // Start auto-refresh
+    startAutoRefresh(); // 自動更新を開始
   } catch (error) {
     alert('サーバー通信失敗: ' + error.message);
   } finally {
@@ -84,7 +83,7 @@ function drawSeatMap(seatMap) {
 
   const layout = {
     main: { rows: ['A', 'B', 'C', 'D'], cols: 12, passageAfter: 6 },
-    sub: { rows: ['E'], frontCols: 3, backCols: 3, passagePosition: 3 } // 更新: E列に3席×2の構成
+    sub: { rows: ['E'], frontCols: 3, backCols: 3, passagePosition: 3 }
   };
 
   // メインセクションの描画
@@ -140,6 +139,7 @@ function drawSeatMap(seatMap) {
   });
   container.appendChild(subSection);
 }
+
 // 座席要素を作成する関数
 function createSeatElement(seat) {
   const el = document.createElement('div'); // 新しい座席要素を作成
@@ -161,13 +161,12 @@ function createSeatElement(seat) {
 
   // Check-in button for admin
   if ((seat.status === 'to-be-checked-in' || seat.status === 'reserved') && IS_ADMIN) {
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'check-in-checkbox';
-        checkbox.dataset.seatId = seat.id;
-        el.appendChild(checkbox);
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'check-in-checkbox';
+      checkbox.dataset.seatId = seat.id;
+      el.appendChild(checkbox);
   }
-
 
   return el; // 作成した座席要素を返す
 }

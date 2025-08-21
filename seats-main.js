@@ -1,5 +1,7 @@
+// seats-main.js
 import GasAPI from './api.js';
 import { loadSidebar, toggleSidebar } from './sidebar.js';
+import { GAS_API_URL, DEBUG_MODE, debugLog } from './config.js';
 
 /**
  * 座席選択画面のメイン処理
@@ -16,6 +18,10 @@ let autoRefreshInterval = null;
 let lastUpdateTime = null;
 let isRefreshing = false;
 let settingsOpen = false;
+
+// APIエンドポイントを設定
+const apiEndpoint = GAS_API_URL;
+const api = new GasAPI(apiEndpoint);
 
 // 初期化
 window.onload = async () => {
@@ -37,25 +43,25 @@ window.onload = async () => {
         document.getElementById('check-in-selected-btn').style.display = 'none';
     }
 
-    showLoader(true); // ロードインジケーターを表示
+    showLoader(true);
 
     try {
-        const seatData = await GasAPI.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
+        const seatData = await api.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
 
-        console.log("Received seatData:", seatData);
+        debugLog("Received seatData:", seatData);
         
         if (seatData.success === false) {
             alert('データ読み込み失敗: ' + seatData.error);
             return;
         }
 
-        drawSeatMap(seatData.seatMap); // 座席マップを描画
-        updateLastUpdateTime(); // 最終更新時間を更新
-        startAutoRefresh(); // 自動更新を開始
+        drawSeatMap(seatData.seatMap);
+        updateLastUpdateTime();
+        startAutoRefresh();
     } catch (error) {
         alert('サーバー通信失敗: ' + error.message);
     } finally {
-        showLoader(false); // ロードインジケーターを非表示に
+        showLoader(false);
     }
 };
 
@@ -70,7 +76,7 @@ function updateLastUpdateTime() {
 function showLoader(visible) {
     const loader = document.getElementById('loading-modal');
     if (loader) {
-        loader.style.display = visible ? 'block' : 'none'; // ローダーを表示または非表示
+        loader.style.display = visible ? 'block' : 'none';
     } else {
         console.warn('Loader element not found');
     }
@@ -79,14 +85,13 @@ function showLoader(visible) {
 // 座席マップを描画する関数
 function drawSeatMap(seatMap) {
     const container = document.getElementById('seat-map-container');
-    container.innerHTML = ''; // 既存の座席マップをクリア
+    container.innerHTML = '';
 
     const layout = {
         main: { rows: ['A', 'B', 'C', 'D'], cols: 12, passageAfter: 6 },
         sub: { rows: ['E'], frontCols: 3, backCols: 3, passagePosition: 3 }
     };
 
-    // メインセクションの描画
     const mainSection = document.createElement('div');
     mainSection.className = 'seat-section';
 
@@ -100,7 +105,7 @@ function drawSeatMap(seatMap) {
 
             if (i === layout.main.passageAfter) {
                 const passage = document.createElement('div');
-                passage.className = 'passage'; // 通路の追加
+                passage.className = 'passage';
                 rowEl.appendChild(passage);
             }
         }
@@ -108,7 +113,6 @@ function drawSeatMap(seatMap) {
     });
     container.appendChild(mainSection);
 
-    // サブセクション (E行) の描画
     const subSection = document.createElement('div');
     subSection.className = 'seat-section';
 
@@ -116,21 +120,18 @@ function drawSeatMap(seatMap) {
         const rowEl = document.createElement('div');
         rowEl.className = 'seat-row';
 
-        // E列の前半3席を描画
         for (let i = 1; i <= layout.sub.frontCols; i++) {
             const seatId = rowLabel + i;
             const seatData = seatMap[seatId] || { id: seatId, status: 'unavailable', name: null };
             rowEl.appendChild(createSeatElement(seatData));
         }
 
-        // 通路の追加
         const passage = document.createElement('div');
-        passage.className = 'passage'; // E列の通路
+        passage.className = 'passage';
         rowEl.appendChild(passage);
 
-        // E列の後半3席を描画
         for (let i = 1; i <= layout.sub.backCols; i++) {
-            const seatId = rowLabel + (layout.sub.frontCols + i); // 座席IDを更新
+            const seatId = rowLabel + (layout.sub.frontCols + i);
             const seatData = seatMap[seatId] || { id: seatId, status: 'unavailable', name: null };
             rowEl.appendChild(createSeatElement(seatData));
         }
@@ -140,26 +141,22 @@ function drawSeatMap(seatMap) {
     container.appendChild(subSection);
 }
 
-// 座席要素を作成する関数
 function createSeatElement(seat) {
-    const el = document.createElement('div'); // 新しい座席要素を作成
-    el.className = `seat ${seat.status}`; // 状態に応じたクラスを設定
-    el.dataset.id = seat.id; // データ属性に座席IDを設定
-    el.innerHTML = `<span class="seat-id">${seat.id}</span>`; // 座席IDを表示
+    const el = document.createElement('div');
+    el.className = `seat ${seat.status}`;
+    el.dataset.id = seat.id;
+    el.innerHTML = `<span class="seat-id">${seat.id}</span>`;
 
-    // 管理者モードでの座席名の表示
     if (IS_ADMIN && seat.name) {
         el.innerHTML += `<span class="seat-name">${seat.name}</span>`;
     }
 
-    // 空いている座席の場合、クリックイベントを設定
     if (seat.status === 'available') {
         el.onclick = () => {
-            toggleSeatSelection(seat.id); // 座席がクリックされた際の処理
+            toggleSeatSelection(seat.id);
         };
     }
 
-    // Check-in button for admin
     if ((seat.status === 'to-be-checked-in' || seat.status === 'reserved') && IS_ADMIN) {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -168,32 +165,29 @@ function createSeatElement(seat) {
         el.appendChild(checkbox);
     }
 
-    return el; // 作成した座席要素を返す
+    return el;
 }
 
-// 座席選択用のトグル関数
 function toggleSeatSelection(seatId) {
     const el = document.querySelector(`.seat[data-id='${seatId}']`);
     if (!el) return;
 
     const index = selectedSeats.indexOf(seatId);
-    if (index > -1) { // 既に選択されている座席を解除
+    if (index > -1) {
         selectedSeats.splice(index, 1);
-        el.classList.remove('selected'); // 無選択状態
-    } else { // 新たに選択
+        el.classList.remove('selected');
+    } else {
         selectedSeats.push(seatId);
-        el.classList.add('selected'); // 選択状態
+        el.classList.add('selected');
     }
 }
 
-// Check-in function
 async function checkIn(seatIds) {
     if (!seatIds || seatIds.length === 0) {
         alert('座席を1つ以上選択してください。');
         return;
     }
 
-    // Retrieve names associated with each seat ID
     let seatInfo = seatIds.map(seatId => {
         const seatElement = document.querySelector(`.seat[data-id='${seatId}']`);
         const nameElement = seatElement ? seatElement.querySelector('.seat-name') : null;
@@ -205,11 +199,12 @@ async function checkIn(seatIds) {
 
     if (!confirm(confirmMessage)) return;
 
-    showLoader(true); // ローダー表示
+    showLoader(true);
 
     try {
-        const res = await GasAPI.checkInSeat(GROUP, DAY, TIMESLOT, seatIds);
-        showLoader(false); // ローダー非表示
+        const res = await api.checkInSeat(GROUP, DAY, TIMESLOT, seatIds);
+
+        showLoader(false);
 
         let alertMessage = res.success
             ? `選択した座席のチェックインが完了しました。`
@@ -217,24 +212,21 @@ async function checkIn(seatIds) {
         alert(alertMessage);
 
         if (res.success) {
-            // シートデータを再取得して表示を更新
-            const seatData = await GasAPI.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
+            const seatData = await api.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
             drawSeatMap(seatData.seatMap);
         }
     } catch (err) {
-        showLoader(false); // ローダー非表示
+        showLoader(false);
         alert(`エラー: ${err.message}`);
     }
 }
 
-// Function to collect selected seat IDs from checkboxes
 window.checkInSelected = () => {
     const checkboxes = document.querySelectorAll('.check-in-checkbox:checked');
     const seatIds = Array.from(checkboxes).map(checkbox => checkbox.dataset.seatId);
     checkIn(seatIds);
 };
 
-// Settings panel functions
 window.toggleSettings = () => {
     settingsOpen = !settingsOpen;
     const settingsPanel = document.getElementById('settings-panel');
@@ -258,15 +250,15 @@ window.closeSettings = () => {
 };
 
 function startAutoRefresh() {
-    stopAutoRefresh(); // Clear existing interval, if any
+    stopAutoRefresh();
 
     if (!isAutoRefreshEnabled) return;
 
     autoRefreshInterval = setInterval(async () => {
-        if (!document.hidden && !isRefreshing) { // ページがアクティブかつ更新中でない場合のみ
+        if (!document.hidden && !isRefreshing) {
             try {
                 isRefreshing = true;
-                const seatData = await GasAPI.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
+                const seatData = await api.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
                 drawSeatMap(seatData.seatMap);
                 updateLastUpdateTime();
             } catch (error) {
@@ -275,7 +267,7 @@ function startAutoRefresh() {
                 isRefreshing = false;
             }
         }
-    }, 30000); // 30秒間隔
+    }, 30000);
 }
 
 function stopAutoRefresh() {
@@ -297,8 +289,8 @@ window.toggleAutoRefresh = () => {
 };
 
 window.manualRefresh = async () => {
-    await updateSeatData(true); // ローダー表示あり
-    closeSettings(); // 設定パネルを閉じる
+    await updateSeatData(true);
+    closeSettings();
 };
 
 async function updateSeatData(showLoaderFlag = false) {
@@ -311,7 +303,7 @@ async function updateSeatData(showLoaderFlag = false) {
     refreshBtn.textContent = '更新中...';
 
     try {
-        const seatData = await GasAPI.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
+        const seatData = await api.getSeatData(GROUP, DAY, TIMESLOT, IS_ADMIN);
 
         if (showLoaderFlag) showLoader(false);
         refreshBtn.disabled = false;

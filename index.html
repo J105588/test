@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
-
   <div id="sidebar-container"></div>
 
   <div id="main-content">
@@ -16,7 +15,6 @@
       <button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
       <h1>組選択</h1>
     </header>
-
     <main class="container">
       <p class="description">管理する組または演劇を選択してください。</p>
       <div class="grid-container">
@@ -35,12 +33,12 @@
 
   <script type="module">
     import { loadSidebar, toggleSidebar, showModeChangeModal } from './sidebar.js';
-
+    
     loadSidebar();
 
     // グローバルスコープに関数を登録
     window.toggleSidebar = toggleSidebar;
-    window.showModeChangeModal = showModeChangeModal; // showModeChangeModalを登録
+    window.showModeChangeModal = showModeChangeModal;
   </script>
 </body>
 </html>

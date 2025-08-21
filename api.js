@@ -1,85 +1,69 @@
-/**
- * GAS APIとの通信を行うモジュール (POSTリクエスト対応版)
- * config.jsに定義されたGAS_API_URLとdebugLogを使用します。
- * POSTリクエストを利用してCORSの問題を回避します。
- */
-
-function debugLog(message, data) {
-    if (typeof DEBUG_MODE !== 'undefined' && DEBUG_MODE) {
-        console.log('[DEBUG]', message, data);
-    }
-}
-
+// api.js
 class GasAPI {
-    static async _callApi(functionName, params = []) {
-        debugLog(`API Call (POST): ${functionName}`, params);
+  constructor(apiEndpoint) {
+    this.apiEndpoint = apiEndpoint;
+  }
 
-        if (typeof GAS_API_URL === 'undefined' || !GAS_API_URL) {
-            const errorMessage = "GASのAPI URLが定義されていないか、空です。config.jsを確認してください。";
-            console.error(errorMessage);
-            throw new Error(errorMessage);
-        }
+  async _callApi(func, params = []) {
+    const payload = {
+      func: func,
+      params: params,
+    };
 
-        const postData = { func: functionName, params: params };
-        debugLog('Request Body:', postData);
+    console.debug('[DEBUG] API Call (POST):', func);
+    console.debug(params.length > 0 ? params : 'No parameters');
+    console.debug('[DEBUG] Request Body:', payload);
 
-        try {
-            const response = await fetch(GAS_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json;charset=utf-8' },
-                body: JSON.stringify(postData),
-                redirect: 'follow'
-            });
+    try {
+      const response = await fetch(this.apiEndpoint, {
+        method: 'POST',
+        mode: 'cors',  // CORSを有効にする
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-            if (!response.ok) {
-                throw new Error(`サーバーとの通信に失敗しました (HTTPステータス: ${response.status})`);
-            }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-            const data = await response.json();
-            debugLog(`API Response: ${functionName}`, data);
+      const data = await response.json();
 
-            if (data.success === false) {
-                throw new Error(data.error || 'GAS側で処理エラーが発生しました。');
-            }
+      if (data.error) {
+        console.error(`API Error (${func}): ${data.error}`);
+        throw new Error(data.error);
+      }
 
-            return data;
-
-        } catch (error) {
-            const errorMessage = error.message || '不明なエラー';
-            console.error(`API Error (${functionName}):`, errorMessage, error);
-            throw new Error(`API呼び出しに失敗しました: ${errorMessage}`);
-        }
+      console.debug('[DEBUG] API Response:', data);
+      return data;
+    } catch (error) {
+      console.error(`API Error (${func}): Failed to fetch`, error);
+      throw error;
     }
+  }
 
-    // 各API関数の呼び出し
-    static async getSeatData(group, day, timeslot, isAdmin) {
-        return this._callApi('getSeatData', [group, day, timeslot, isAdmin]);
-    }
+  async getSeatData(group, day, timeslot, isAdmin = false) {
+    return await this._callApi('getSeatData', [group, day, timeslot, isAdmin]);
+  }
 
-    static async reserveSeats(group, day, timeslot, selectedSeats) {
-        return this._callApi('reserveSeats', [group, day, timeslot, selectedSeats]);
-    }
+  async reserveSeats(group, day, timeslot, selectedSeats) {
+    return await this._callApi('reserveSeats', [group, day, timeslot, selectedSeats]);
+  }
 
-    static async checkInSeat(group, day, timeslot, seatId) {
-        return this._callApi('checkInSeat', [group, day, timeslot, seatId]);
-    }
+  async checkInSeat(group, day, timeslot, seatId) {
+    return await this._callApi('checkInSeat', [group, day, timeslot, seatId]);
+  }
 
-    static async assignWalkInSeat(group, day, timeslot) {
-        return this._callApi('assignWalkInSeat', [group, day, timeslot]);
-    }
+  async assignWalkInSeat(group, day, timeslot) {
+    return await this._callApi('assignWalkInSeat', [group, day, timeslot]);
+  }
 
-    static async verifyAdminPassword(password) {
-        return this._callApi('verifyAdminPassword', [password]);
-    }
+  async verifyModePassword(mode, password) {
+    return await this._callApi('verifyModePassword', [mode, password]);
+  }
 
-    static async verifyModePassword(mode, password) {
-        return this._callApi('verifyModePassword', [mode, password]);
-    }
-
-    static async getAllTimeslotsForGroup(group) {
-        return this._callApi('getAllTimeslotsForGroup', [group]);
-    }
+  async getAllTimeslotsForGroup(group) {
+    return await this._callApi('getAllTimeslotsForGroup', [group]);
+  }
 }
-
-// エクスポートを追加する
-export default GasAPI;

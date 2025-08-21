@@ -5,7 +5,9 @@
  */
 
 function debugLog(message, data) {
-  console.log('[DEBUG]', message, data);
+  if (typeof DEBUG_MODE !== 'undefined' && DEBUG_MODE) {
+    console.log('[DEBUG]', message, data);
+  }
 }
 
 class GasAPI {
@@ -24,7 +26,7 @@ class GasAPI {
     try {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': 'application/json;charset=utf-8' },
         body: JSON.stringify(postData),
         redirect: 'follow'
       });
@@ -54,7 +56,6 @@ class GasAPI {
     return this._callApi('getSeatData', [group, day, timeslot, isAdmin]);
   }
   
-  // エクスポートを追加
   static async reserveSeats(group, day, timeslot, selectedSeats) {
     return this._callApi('reserveSeats', [group, day, timeslot, selectedSeats]);
   }

@@ -11,11 +11,11 @@ const DEBUG_MODE = true;
 
 // ログ出力関数
 function debugLog(message, data = null) {
-  if (DEBUG_MODE) {
-    if (data) {
-      console.log(message, data);
-    } else {
-      console.log(message);
+    if (DEBUG_MODE) {
+        if (data) {
+            console.log(message, data);
+        } else {
+            console.log(message);
+        }
     }
-  }
 }

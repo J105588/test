@@ -17,8 +17,7 @@ class GasAPI {
     try {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, // CORS回避のためtext/plainに設定
-        // mode: 'no-cors', // CORSを無視  <-- 削除
+        // headers: { 'Content-Type': 'text/plain' }, // CORS回避のためtext/plainに設定 <-- 削除
         body: JSON.stringify(postData), // POSTデータをJSON形式で送信
         redirect: 'follow'
       });
@@ -47,6 +46,12 @@ class GasAPI {
   static async getAllTimeslotsForGroup(group) {
     const response = await this._callApi('getAllTimeslotsForGroup', [group]); // API関数の呼び出し
     return response.data; // データを返す
+  }
+
+  // シンプルなテスト用API関数
+  static async testApi() {
+    const response = await this._callApi('testApi');
+    return response.data;
   }
 }
 

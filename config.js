@@ -20,5 +20,7 @@ function debugLog(message, data = null) {
     }
 }
 
-// Exportする内容
-export { GAS_API_URL, DEBUG_MODE, debugLog };
+// グローバル変数として設定
+window.GAS_API_URL = GAS_API_URL;
+window.DEBUG_MODE = DEBUG_MODE;
+window.debugLog = debugLog;

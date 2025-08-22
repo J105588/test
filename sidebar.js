@@ -1,4 +1,4 @@
-import GasAPI from './api.js';
+import GasAPI from './api.js'; // GasAPIをインポート
 
 const sidebarHTML = `
   <div id="mySidebar" class="sidebar">
@@ -75,7 +75,7 @@ async function applyModeChange() {
             alert(`${selectedMode} モードに切り替えました`);
             closeModeModal(); // モーダルを閉じる
         } else {
-            alert('パスワードが間違っています。');      
+            alert('パスワードが間違っています。');
         }
     } catch (error) {
         alert(`エラーが発生しました: ${error.message}`);
@@ -107,3 +107,6 @@ function toggleSidebar() {
 // グローバル変数として設定
 window.loadSidebar = loadSidebar;
 window.toggleSidebar = toggleSidebar;
+window.showModeChangeModal = showModeChangeModal; // モーダルを表示する関数もグローバル登録
+window.closeModeModal = closeModeModal; // モーダルを閉じる関数もグローバル登録
+window.applyModeChange = applyModeChange; // モード変更を適用する関数もグローバル登録

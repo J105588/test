@@ -1,5 +1,5 @@
 import GasAPI from './api.js';
-import { loadSidebar } from './sidebar.js';
+import { loadSidebar, toggleSidebar, showModeChangeModal } from './sidebar.js';
 import { GAS_API_URL, DEBUG_MODE, debugLog } from './config.js';
 
 /**

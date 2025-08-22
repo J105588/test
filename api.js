@@ -17,7 +17,8 @@ class GasAPI {
     try {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, // CORS回避のためtext/plainに設定
+        // headers: { 'Content-Type': 'text/plain' }, // CORS回避のためtext/plainに設定  <-- Content-Type ヘッダーを削除
+        mode: 'no-cors', // CORSを無視
         body: JSON.stringify(postData), // POSTデータをJSON形式で送信
         redirect: 'follow'
       });

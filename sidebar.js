@@ -110,3 +110,5 @@ window.toggleSidebar = toggleSidebar;
 window.showModeChangeModal = showModeChangeModal; // モーダルを表示する関数もグローバル登録
 window.closeModeModal = closeModeModal; // モーダルを閉じる関数もグローバル登録
 window.applyModeChange = applyModeChange; // モード変更を適用する関数もグローバル登録
+
+export { loadSidebar, toggleSidebar, showModeChangeModal, closeModeModal, applyModeChange };

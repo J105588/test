@@ -1,9 +1,3 @@
-/**
- * GAS APIとの通信を行うモジュール (POSTリクエスト対応版)
- * config.jsに定義されたGAS_API_URLとdebugLogを使用します。
- * POSTリクエストを利用してCORSの問題を回避します。
- */
-
 import { GAS_API_URL, DEBUG_MODE, debugLog } from './config.js';
 
 class GasAPI {
@@ -48,57 +42,12 @@ class GasAPI {
     }
   }
 
-  // 各API関数の呼び出し
-  static async getSeatData(group, day, timeslot, isAdmin) {
-    if (!group || !day || !timeslot) {
-      throw new Error("getSeatData: group, day, timeslotは必須パラメータです。");
-    }
-    return this._callApi('getSeatData', [group, day, timeslot, isAdmin]);
-  }
-
-  static async reserveSeats(group, day, timeslot, selectedSeats) {
-    if (!group || !day || !timeslot || !Array.isArray(selectedSeats)) {
-      throw new Error("reserveSeats: group, day, timeslot, selectedSeatsは必須パラメータです。");
-    }
-    return this._callApi('reserveSeats', [group, day, timeslot, selectedSeats]);
-  }
-
-  static async checkInSeat(group, day, timeslot, seatId) {
-    if (!group || !day || !timeslot || !seatId) {
-      throw new Error("checkInSeat: group, day, timeslot, seatIdは必須パラメータです。");
-    }
-    return this._callApi('checkInSeat', [group, day, timeslot, seatId]);
-  }
-
-  static async assignWalkInSeat(group, day, timeslot) {
-    if (!group || !day || !timeslot) {
-      throw new Error("assignWalkInSeat: group, day, timeslotは必須パラメータです。");
-    }
-    return this._callApi('assignWalkInSeat', [group, day, timeslot]);
-  }
-
-  static async verifyAdminPassword(password) {
-    if (!password) {
-      throw new Error("verifyAdminPassword: passwordは必須パラメータです。");
-    }
-    return this._callApi('verifyAdminPassword', [password]);
-  }
-
-  static async verifyModePassword(mode, password) {
-    if (!mode || !password) {
-      throw new Error("verifyModePassword: mode, passwordは必須パラメータです。");
-    }
-    return this._callApi('verifyModePassword', [mode, password]);
-  }
-
   static async getAllTimeslotsForGroup(group) {
-    if (!group) {
-      throw new Error("getAllTimeslotsForGroup: groupは必須パラメータです。");
-    }
-    return this._callApi('getAllTimeslotsForGroup', [group]);
+    const response = await this._callApi('getAllTimeslotsForGroup', [group]);
+    return response.data;
   }
 }
 
 // グローバル変数として設定
-window.GasAPI = GasAPI; // ここはグローバル変数の設定です。 エラーには影響しません。
-export default GasAPI;
+window.GasAPI = GasAPI;
+export default GasAPI; // これを修正することでエラーを解決

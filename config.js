@@ -4,21 +4,16 @@
  */
 
 // GAS Web App URLを設定
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxm4AGAOIPDOEbCgm5cZfrZsB8WvDRVFL_qVXPvRdf_sFr3Jg6CpRiuoQ1lNMCWLA1V/exec"; // API
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyr_lHjQUUKLP6y8-OwxHTdx5NbVOKl6vpNGUwYBYpDZgNe30isnztEPJN1xzPuKEXn/exec";
 
-// デバッグモードを常にtrueに設定
+// テスト用デバッグモード
 const DEBUG_MODE = true;
 
-// ログ出力関数
-function debugLog(message, data = null) {
-    if (DEBUG_MODE) {
-        if (data) {
-            console.log(message, data);
-        } else {
-            console.log(message);
-        }
-    }
+function debugLog(message, obj = null) {
+  if (DEBUG_MODE) {
+    console.log(message, obj || '');
+  }
 }
 
-// Exportする内容
+// モジュールとしてエクスポート
 export { GAS_API_URL, DEBUG_MODE, debugLog };

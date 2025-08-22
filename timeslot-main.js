@@ -32,9 +32,9 @@ function selectTimeslot(day, timeslot) {
   window.location.href = url;
 }
 
-function loadTimeslots(group) {
+async function loadTimeslots(group) {
   const container = document.getElementById('timeslot-container');
-  const timeslots = getAllTimeslotsForGroup(group);
+  const timeslots = await GasAPI.getAllTimeslotsForGroup(group); // ここを修正
 
   if (!timeslots || timeslots.length === 0) {
     container.innerHTML = '<p class="description">この組に設定された公演時間帯がありません。</p>';
@@ -70,6 +70,3 @@ function loadTimeslots(group) {
 function getDayName(day) {
   return day == 1 ? '1日目' : '2日目';
 }
-
-// グローバル関数として設定
-window.loadTimeslots = loadTimeslots;

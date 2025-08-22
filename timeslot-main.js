@@ -1,9 +1,7 @@
 import GasAPI from './api.js';
 import { loadSidebar, toggleSidebar } from './sidebar.js';
-import { getAllTimeslotsForGroup } from './timeslot-schedules.js'; // 追加
 
 // --- 初期化処理 (ページの読み込み時に自動で実行されます) ---
-
 const urlParams = new URLSearchParams(window.location.search);
 const group = urlParams.get('group');
 
@@ -22,12 +20,6 @@ window.toggleSidebar = toggleSidebar;
 window.selectTimeslot = selectTimeslot;
 
 // --- 関数定義 ---
-
-/**
- * ユーザーが時間帯を選択したときに呼び出される関数
- * @param {number | string} day - 日 (例: 1)
- * @param {string} timeslot - 時間帯 (例: 'A')
- */
 function selectTimeslot(day, timeslot) {
   const isAdmin = urlParams.get('admin') === 'true';
   let targetPage = 'seats.html';
@@ -40,10 +32,6 @@ function selectTimeslot(day, timeslot) {
   window.location.href = url;
 }
 
-/**
- * 指定された組の時間帯データを取得し、ページに表示する関数
- * @param {string} group - 組名 (例: '1', '見本演劇')
- */
 function loadTimeslots(group) {
   const container = document.getElementById('timeslot-container');
   const timeslots = getAllTimeslotsForGroup(group);
@@ -79,11 +67,9 @@ function loadTimeslots(group) {
   container.innerHTML = html;
 }
 
-/**
- * 数字の日付を「N日目」という文字列に変換するヘルパー関数
- * @param {number | string} day 
- * @returns {string}
- */
 function getDayName(day) {
   return day == 1 ? '1日目' : '2日目';
 }
+
+// グローバル関数として設定
+window.loadTimeslots = loadTimeslots;

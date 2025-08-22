@@ -3,7 +3,7 @@
  */
 
 import GasAPI from './api.js'; // GasAPIをインポート
-import { loadSidebar } from './sidebar.js'; // loadSidebarをインポート
+import { loadSidebar, toggleSidebar, showModeChangeModal } from './sidebar.js';
 
 // URLパラメータ取得
 const urlParams = new URLSearchParams(window.location.search);

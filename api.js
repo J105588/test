@@ -101,3 +101,4 @@ class GasAPI {
 
 // グローバル変数として設定
 window.GasAPI = GasAPI;
+export default GasAPI;

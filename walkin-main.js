@@ -27,7 +27,9 @@ window.onload = () => {
 
 function showLoader(visible) {
   const loader = document.getElementById('loading-modal');
-  loader.style.display = visible ? 'block' : 'none';
+  if (loader) {
+    loader.style.display = visible ? 'block' : 'none';
+  }
 }
 
 async function issueWalkinTicket() {
@@ -44,9 +46,8 @@ async function issueWalkinTicket() {
   try {
     const response = await GasAPI.assignWalkInSeat(GROUP, DAY, TIMESLOT);
     
-    alert(response.message);
-    
     if (response.success) {
+      alert(response.message || '座席が確保されました。');
       walkinBtn.textContent = `発行完了 (座席: ${response.seatId || '不明'})`;
       walkinBtn.style.background = '#28a745';
       
@@ -58,9 +59,10 @@ async function issueWalkinTicket() {
       setTimeout(() => {
         walkinBtn.disabled = false;
         walkinBtn.textContent = '再度、空席を探して当日券を発行する';
-        walkinBtn.style.background = '#28a745';
+        walkinBtn.style.background = '#007bff'; // 通常の色に戻す
       }, 3000);
     } else {
+      alert(response.message || '空席が見つかりませんでした。');
       walkinBtn.disabled = false;
       walkinBtn.textContent = '再度、空席を探す';
     }
@@ -72,3 +74,6 @@ async function issueWalkinTicket() {
     showLoader(false);
   }
 }
+
+// ボタン押下時に実行されるようにイベントリスナーを追加
+document.getElementById('walkin-btn').addEventListener('click', issueWalkinTicket);

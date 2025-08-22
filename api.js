@@ -14,11 +14,17 @@ class GasAPI {
     const postData = { func: functionName, params: params };
     debugLog('Request Body:', postData);
 
+    // URLSearchParamsを使用してリクエストボディをエンコード
+    const encodedParams = new URLSearchParams();
+    for (const key in postData) {
+      encodedParams.append(key, JSON.stringify(postData[key])); // 値をJSON文字列として追加
+    }
+
     try {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
-        // headers: { 'Content-Type': 'text/plain' }, // CORS回避のためtext/plainに設定 <-- 削除
-        body: JSON.stringify(postData), // POSTデータをJSON形式で送信
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, // Content-Typeを変更
+        body: encodedParams.toString(), // エンコードされたパラメータを送信
         redirect: 'follow'
       });
 

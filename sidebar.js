@@ -38,7 +38,7 @@ const sidebarHTML = `
   </div>
 `;
 
-export function loadSidebar() {
+function loadSidebar() {
     const container = document.getElementById('sidebar-container');
     if (container) {
         container.innerHTML = sidebarHTML;
@@ -46,16 +46,16 @@ export function loadSidebar() {
     }
 }
 
-export function showModeChangeModal() {
+function showModeChangeModal() {
     document.getElementById("mode-change-modal").style.display = 'block';
 }
 
-export function closeModeModal() {
+function closeModeModal() {
     document.getElementById("mode-change-modal").style.display = 'none';
 }
 
 // モード変更を適用する関数
-export async function applyModeChange() {
+async function applyModeChange() {
     const modeRadios = document.querySelectorAll('input[name="mode"]');
     const password = document.getElementById("mode-password").value;
     let selectedMode;
@@ -83,7 +83,7 @@ export async function applyModeChange() {
 }
 
 // モード表示を更新する関数
-export function updateModeDisplay() {
+function updateModeDisplay() {
     const modeDisplay = document.getElementById("current-mode-display");
     if (modeDisplay) {
         const currentMode = localStorage.getItem('currentMode') || '通常モード';
@@ -91,7 +91,7 @@ export function updateModeDisplay() {
     }
 }
 
-export function toggleSidebar() {
+function toggleSidebar() {
     const sidebar = document.getElementById("mySidebar");
     const main = document.getElementById("main-content");
 
@@ -103,3 +103,7 @@ export function toggleSidebar() {
         main.style.marginLeft = "250px";
     }
 }
+
+// グローバル変数として設定
+window.loadSidebar = loadSidebar;
+window.toggleSidebar = toggleSidebar;

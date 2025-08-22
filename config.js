@@ -3,11 +3,11 @@
  * GAS Web AppのURLを設定してください
  */
 
-// GAS Web App URLに置き換え
+// GAS Web App URLを設定
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxw_NEk1FUvUrWQDH0XFs6ynS5puSpQ6pv2-05Q_cMUJaRsNgPhpmn8IAS_bx2Ilrg8/exec"; // API
 
-// デバッグモード（開発時はtrue、本番はfalse）
-const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+// デバッグモードを常にtrueに設定
+const DEBUG_MODE = true;
 
 // ログ出力関数
 function debugLog(message, data = null) {
@@ -20,4 +20,5 @@ function debugLog(message, data = null) {
     }
 }
 
+// Exportする内容
 export { GAS_API_URL, DEBUG_MODE, debugLog };

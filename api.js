@@ -25,7 +25,8 @@ class GasAPI {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, // Content-Typeを変更
         body: encodedParams.toString(), // エンコードされたパラメータを送信
-        redirect: 'follow'
+        redirect: 'follow',
+        mode: 'cors' // CORSモードを追加
       });
 
       if (!response.ok) {

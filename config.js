@@ -1,5 +1,5 @@
 // config.js
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzNxpQP1kYpKW8bX4q4uPdE9LBs0E_sEFcCca4HvonkUITuedW8dyTuGNVqBWxRbit-/exec";
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzHec16Y1a2KRVs5wt-dafR2GJ5TcEwF1zk1eMiBI4jZxcbBVVSV_3l1Xzdla29TS18/exec";
 const DEBUG_MODE = true;
 
 function debugLog(message, obj = null) {

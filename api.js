@@ -1,4 +1,5 @@
-import { GAS_API_URL, DEBUG_MODE, debugLog } from './config.js';
+// api.js
+import { GAS_API_URL, DEBUG_MODE, debugLog } from './config.js'; // config.jsからインポート
 
 class GasAPI {
   static async _callApi(functionName, params = []) {
@@ -16,8 +17,8 @@ class GasAPI {
     try {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json;charset=utf-8' },
-        body: JSON.stringify(postData),
+        headers: { 'Content-Type': 'text/plain' }, // CORS回避のためtext/plainに設定
+        body: JSON.stringify(postData), // POSTデータをJSON形式で送信
         redirect: 'follow'
       });
 
@@ -26,7 +27,7 @@ class GasAPI {
         throw new Error(`サーバーとの通信に失敗しました (HTTPステータス: ${response.status}, レスポンス: ${errorText})`);
       }
 
-      const data = await response.json();
+      const data = await response.json(); // レスポンスをJSONとして解析
       debugLog(`API Response: ${functionName}`, data);
 
       if (data.success === false) {
@@ -43,11 +44,11 @@ class GasAPI {
   }
 
   static async getAllTimeslotsForGroup(group) {
-    const response = await this._callApi('getAllTimeslotsForGroup', [group]);
-    return response.data;
+    const response = await this._callApi('getAllTimeslotsForGroup', [group]); // API関数の呼び出し
+    return response.data; // データを返す
   }
 }
 
 // グローバル変数として設定
 window.GasAPI = GasAPI;
-export default GasAPI; // これを修正することでエラーを解決
+export default GasAPI; // エクスポート

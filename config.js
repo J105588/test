@@ -1,3 +1,4 @@
+// config.js
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxgBX68FOMrQUn9Ix8JDxDimrzaTwe8chlOifcw6aiOQUgRtLY93bTd9xzmFgEWdUic/exec";
 const DEBUG_MODE = true;
 
@@ -7,4 +8,5 @@ function debugLog(message, obj = null) {
   }
 }
 
-export default { GAS_API_URL, DEBUG_MODE, debugLog }; // 変更
+// 個別にエクスポート
+export { GAS_API_URL, DEBUG_MODE, debugLog };

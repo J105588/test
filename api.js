@@ -100,5 +100,5 @@ class GasAPI {
 }
 
 // グローバル変数として設定
-window.GasAPI = GasAPI;
+window.GasAPI = GasAPI; // ここはグローバル変数の設定です。 エラーには影響しません。
 export default GasAPI;

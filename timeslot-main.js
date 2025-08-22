@@ -1,72 +1,53 @@
+// timeslot-main.js
+import { DEBUG_MODE, debugLog } from './config.js'; // config.jsからインポート
 import GasAPI from './api.js';
-import { loadSidebar, toggleSidebar } from './sidebar.js';
 
-// --- 初期化処理 (ページの読み込み時に自動で実行されます) ---
-const urlParams = new URLSearchParams(window.location.search);
-const group = urlParams.get('group');
+document.addEventListener('DOMContentLoaded', async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const group = urlParams.get('group');
 
-// 組名をページのタイトル部分に表示
-document.getElementById('group-name').textContent = isNaN(parseInt(group)) ? group : group + '組';
-
-// サイドバーを読み込んでページに配置
-loadSidebar();
-
-// 時間帯データを読み込んで表示
-loadTimeslots(group);
-
-// --- グローバル関数の登録 ---
-// HTMLの onclick="..." から呼び出せるように、関数をwindowオブジェクトに登録します。
-window.toggleSidebar = toggleSidebar;
-window.selectTimeslot = selectTimeslot;
-
-// --- 関数定義 ---
-function selectTimeslot(day, timeslot) {
-  const isAdmin = urlParams.get('admin') === 'true';
-  let targetPage = 'seats.html';
-  let additionalParams = '';
-  if (isAdmin) {
-    additionalParams = '&admin=true';
-  }
-
-  const url = `${targetPage}?group=${encodeURIComponent(group)}&day=${day}&timeslot=${timeslot}${additionalParams}`;
-  window.location.href = url;
-}
-
-async function loadTimeslots(group) {
-  const container = document.getElementById('timeslot-container');
-  const timeslots = await GasAPI.getAllTimeslotsForGroup(group); // ここを修正
-
-  if (!timeslots || timeslots.length === 0) {
-    container.innerHTML = '<p class="description">この組に設定された公演時間帯がありません。</p>';
+  if (!group) {
+    alert('グループが指定されていません。');
     return;
   }
 
-  const timeslotsByDay = timeslots.reduce((acc, ts) => {
-    (acc[ts.day] = acc[ts.day] || []).push(ts);
-    return acc;
-  }, {});
+  document.getElementById('group-name').textContent = group; // グループ名を表示
 
-  let html = '';
-  for (const day in timeslotsByDay) {
-    html += `
-      <div class="timeslot-section">
-        <h2>${getDayName(day)}</h2>
-        <div class="grid-container">
-    `;
-    
-    for (const ts of timeslotsByDay[day]) {
-      html += `<a class="grid-item" href="javascript:void(0)" onclick="selectTimeslot('${ts.day}', '${ts.timeslot}')">${ts.displayName}</a>`;
-    }
-    
-    html += `
-        </div>
-      </div>
-    `;
+  await loadTimeslots(group);
+
+  // テストAPIの呼び出し
+  try {
+    const testResult = await GasAPI.testApi();
+    debugLog('Test API Result:', testResult);
+  } catch (error) {
+    console.error('Test API Error:', error);
   }
-  
-  container.innerHTML = html;
-}
+});
 
-function getDayName(day) {
-  return day == 1 ? '1日目' : '2日目';
+async function loadTimeslots(group) {
+  const timeslotContainer = document.getElementById('timeslot-container');
+  timeslotContainer.innerHTML = '<div class="loading">時間帯データを読み込み中...</div>';
+
+  try {
+    const timeslots = await GasAPI.getAllTimeslotsForGroup(group);
+
+    if (!timeslots || timeslots.length === 0) {
+      timeslotContainer.innerHTML = '<p>時間帯データが見つかりませんでした。</p>';
+      return;
+    }
+
+    timeslotContainer.innerHTML = ''; // Clear loading message
+
+    timeslots.forEach(timeslot => {
+      const timeslotElement = document.createElement('a');
+      timeslotElement.href = `seats.html?group=${encodeURIComponent(group)}&day=${encodeURIComponent(timeslot.day)}&timeslot=${encodeURIComponent(timeslot.timeslot)}`;
+      timeslotElement.classList.add('timeslot-item');
+      timeslotElement.textContent = `${timeslot.day} - ${timeslot.timeslot}`;
+      timeslotContainer.appendChild(timeslotElement);
+    });
+
+  } catch (error) {
+    console.error('時間帯データの読み込みエラー:', error);
+    timeslotContainer.innerHTML = '<p>時間帯データの読み込みに失敗しました。</p>';
+  }
 }

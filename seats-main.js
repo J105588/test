@@ -1,3 +1,4 @@
+// seats-main.js
 import GasAPI from './api.js';
 import { loadSidebar, toggleSidebar, showModeChangeModal } from './sidebar.js';
 import { GAS_API_URL, DEBUG_MODE, debugLog } from './config.js';
@@ -20,7 +21,8 @@ let settingsOpen = false;
 
 // APIエンドポイントを設定
 const apiEndpoint = GAS_API_URL;
-const api = new GasAPI(apiEndpoint);
+//const api = new GasAPI(apiEndpoint); // ★削除: apiオブジェクトの作成方法を修正
+const api = new GasAPI();
 
 // 初期化
 window.onload = async () => {

@@ -1,6 +1,8 @@
 // timeslot-main.js
 import { DEBUG_MODE, debugLog } from './config.js'; // config.jsからインポート
 import GasAPI from './api.js';
+//import { getAllTimeslotsForGroup } from './timeslot-schedules.js'; // ★追加: timeslot-schedules.jsからインポート
+import * as timeSlotConfig from './timeslot-schedules.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -29,7 +31,8 @@ async function loadTimeslots(group) {
   timeslotContainer.innerHTML = '<div class="loading">時間帯データを読み込み中...</div>';
 
   try {
-    const timeslots = await GasAPI.getAllTimeslotsForGroup(group);
+    //const timeslots = await GasAPI.getAllTimeslotsForGroup(group); // ★削除: GAS APIの呼び出しを削除
+    const timeslots = timeSlotConfig.getAllTimeslotsForGroup(group); // ★追加: timeslot-schedules.jsから直接データを取得
 
     if (!timeslots || timeslots.length === 0) {
       timeslotContainer.innerHTML = '<p>時間帯データが見つかりませんでした。</p>';

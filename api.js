@@ -2,43 +2,29 @@
 import { GAS_API_URL, DEBUG_MODE, debugLog } from './config.js';
 
 class GasAPI {
-  static async _callApi(functionName, params = []) {
-    debugLog(`API Call (POST): ${functionName}`, params);
+  static _callApi(functionName, params = []) {
+    return new Promise((resolve, reject) => {
+      debugLog(`API Call (JSONP): ${functionName}`, params);
 
-    const postData = { func: functionName, params: params };
+      const callbackName = 'jsonpCallback_' + functionName + '_' + Date.now();
+      window[callbackName] = (data) => {
+        debugLog(`API Response (JSONP): ${functionName}`, data);
+        delete window[callbackName]; // コールバック関数を削除
+        if (data.success === false) {
+          reject(new Error(data.error || '処理エラーが発生しました。'));
+        } else {
+          resolve(data);
+        }
+      };
 
-    // URLSearchParamsを使用してリクエストボディをエンコード
-    const encodedParams = new URLSearchParams();
-    for (const key in postData) {
-      encodedParams.append(key, JSON.stringify(postData[key]));
-    }
-
-    try {
-      const response = await fetch(GAS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encodedParams.toString(),
-        mode: 'cors' // CORSモード
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`通信に失敗しました (HTTPステータス: ${response.status}, レスポンス: ${errorText})`);
-      }
-
-      const data = await response.json();
-      debugLog(`API Response: ${functionName}`, data);
-
-      if (data.success === false) {
-        throw new Error(data.error || '処理エラーが発生しました。');
-      }
-
-      return data;
-
-    } catch (error) {
-      console.error(`API Error (${functionName}):`, error.message);
-      throw error; // エラーを再スロー
-    }
+      const script = document.createElement('script');
+      let url = `${GAS_API_URL}?callback=${callbackName}&func=${functionName}&params=${encodeURIComponent(JSON.stringify(params))}`;
+      script.src = url;
+      script.onerror = (error) => {
+        reject(new Error(`JSONPリクエストに失敗しました: ${error.message}`));
+      };
+      document.head.appendChild(script);
+    });
   }
 
   static async getAllTimeslotsForGroup(group) {
@@ -50,6 +36,31 @@ class GasAPI {
     const response = await this._callApi('testApi');
     return response.data;
   }
+
+  static async verifyModePassword(mode, password) {
+    const response = await this._callApi('verifyModePassword', [mode, password]);
+    return response;
+  }
+
+  static async getSeatData(group, day, timeslot, isAdmin) {
+        const response = await this._callApi('getSeatData', [group, day, timeslot, isAdmin]);
+        return response;
+    }
+
+    static async assignWalkInSeat(group, day, timeslot) {
+        const response = await this._callApi('assignWalkInSeat', [group, day, timeslot]);
+        return response;
+    }
+
+    static async reserveSeats(group, day, timeslot, selectedSeats) {
+        const response = await this._callApi('reserveSeats', [group, day, timeslot, selectedSeats]);
+        return response;
+    }
+
+    static async checkInSeat(group, day, timeslot, seatId) {
+        const response = await this._callApi('checkInSeat', [group, day, timeslot, seatId]);
+        return response;
+    }
 }
 
 window.GasAPI = GasAPI;

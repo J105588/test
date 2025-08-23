@@ -1,5 +1,4 @@
-// config.js
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbykcf7mFGGGIzhctpj1yrT2f__pmNHvu1YXQCwya6aLKmKrmf8Ny7_LwOVauDv0oF0n/exec";
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyR1BjAigNCMhqveOWxwyWDi_R7KR7y5s6j_xY9M5iua8NeBpZP95JckAPKufXNwf0d/exec"; // サーバーのAPIエンドポイント
 const DEBUG_MODE = true;
 
 function debugLog(message, obj = null) {

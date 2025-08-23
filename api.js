@@ -7,7 +7,7 @@ class GasAPI {
     // CORSを使用してfetchでデータを取得
     try {
       const response = await fetch(GAS_API_URL, {
-        method: 'POST', // POSTメソッドを使用
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },

@@ -63,5 +63,5 @@ class GasAPI {
     }
 }
 
-window.GasAPI = GasAPI;
+//window.GasAPI = GasAPI; // ★削除: グローバル変数の定義は不要
 export default GasAPI;
